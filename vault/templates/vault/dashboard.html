@@ -1,0 +1,12 @@
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <p>Welcome {{ request.user.username }} to the Dashboard </p>
+    <form method="post" action="{% url 'logout' %}">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Logout</button>
+</form>
+</body>
+</html>
