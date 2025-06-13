@@ -16,6 +16,7 @@
                     <th>Filename</th>
                     <th>Uploaded At</th>
                     <th>Download</th>
+                    <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,6 +26,9 @@
                     <td>{{ file.upload_time }}</td>
                     <td>
                         {#<a class="btn btn-sm btn-primary" href="{% url 'download_file' file.id %}">Download</a>#}
+                    </td>
+                    <td>
+                        {#<a class="btn btn-sm btn-primary" href="{% url 'delete_file' file.id %}">Delete</a>#}
                     </td>
                 </tr>
                 {% empty %}

@@ -36,3 +36,9 @@ class EncryptedFile(models.Model):
 
     def __str__(self):
         return f"{self.original_name} uploaded by {self.owner.username}"
+
+class AccessLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    file = models.ForeignKey(EncryptedFile, on_delete=models.CASCADE)
+    action = models.CharField(max_length=20)
+    timestamp = models.DateTimeField(auto_now_add=True)
