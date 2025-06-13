@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.contrib.auth.models import User
 from cryptography.fernet import Fernet
@@ -39,6 +40,6 @@ class EncryptedFile(models.Model):
 
 class AccessLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    file = models.ForeignKey(EncryptedFile, on_delete=models.CASCADE)
+    file_name = models.CharField(max_length=255, default="Unknown")
     action = models.CharField(max_length=20)
     timestamp = models.DateTimeField(auto_now_add=True)

@@ -29,6 +29,7 @@ def register(request):
 def upload_page(request):
     return render(request, 'vault/upload_page.html')
 
+
 @login_required
 def upload_file(request):
     if request.method == 'POST':
@@ -51,17 +52,19 @@ def upload_file(request):
 
         AccessLog.objects.create(
             user=request.user,
-            file=encrypted,
+            file_name=encrypted.original_name,
             action='upload'
         )
 
         return JsonResponse({'status': 'ok'},status=200)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+
 @login_required
 def file_list(request):
     files = EncryptedFile.objects.filter(owner=request.user).order_by('-upload_time')
     return render(request, 'vault/file_list.html', {'files': files})
+
 
 @login_required
 def download_file(request, file_id):
@@ -69,17 +72,34 @@ def download_file(request, file_id):
     user_key = request.user.userprofile.get_decrypted_key()
     fernet = Fernet(user_key)
     decrypted_aes_key = fernet.decrypt(file.encrypted_aes_key)
-    
+
     with file.file.open('rb') as f:
         encrypted_data = f.read()
+    
+    AccessLog.objects.create(
+            user=request.user,
+            file_name=file.original_name,
+            action='download'
+        )
 
     return JsonResponse({
         'filename': file.original_name,
         'encrypted_data': base64.b64encode(encrypted_data).decode(),
         'aes_key': base64.b64encode(decrypted_aes_key).decode(),
-        'iv': file.iv
+        'iv': base64.b64encode(file.iv).decode()
     })
+
 
 @login_required
 def delete_file(request,file_id):
-    pass
+    if request.method=='DELETE':
+        file=get_object_or_404(EncryptedFile,id=file_id,owner=request.user)
+        AccessLog.objects.create(
+            user=request.user,
+            file_name=file.original_name,
+            action='delete'
+        )
+        file.delete()
+
+        return JsonResponse({'status': 'ok'}, status=200)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
