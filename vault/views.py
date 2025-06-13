@@ -49,11 +49,14 @@ def upload_file(request):
             original_name=uploaded_file.name.replace(".enc", ""),
             iv=iv
         )
-        return JsonResponse({'status': 'ok'})
+        return JsonResponse({'status': 'ok'},status=200)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 @login_required
 def file_list(request):
-    files = EncryptedFile.objects.filter(owner=request.user).order_by('-uploaded_at')
+    files = EncryptedFile.objects.filter(owner=request.user).order_by('-upload_time')
     return render(request, 'vault/file_list.html', {'files': files})
 
+@login_required
+def download_file(request, file_id):
+    pass
