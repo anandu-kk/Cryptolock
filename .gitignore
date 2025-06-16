@@ -8,7 +8,6 @@ db.sqlite3
 /media/
 /staticfiles/
 /encrypted_files/
-/Cryptolock/settings.py
 
 # Environment
 .env
