@@ -71,7 +71,15 @@ def download_file(request, file_id):
     file=get_object_or_404(EncryptedFile, id=file_id, owner=request.user)
     user_key = request.user.userprofile.get_decrypted_key()
     fernet = Fernet(user_key)
-    decrypted_aes_key = fernet.decrypt(file.encrypted_aes_key)
+    encrypted_aes_key = file.encrypted_aes_key
+    # Handle Postgres (memoryview), None, or other types
+    if encrypted_aes_key is None:
+        raise ValueError("Encrypted AES key is missing.")
+    if isinstance(encrypted_aes_key, memoryview):
+        encrypted_aes_key = encrypted_aes_key.tobytes()
+    elif not isinstance(encrypted_aes_key, (bytes, str)):
+        raise TypeError(f"encrypted_aes_key must be bytes, str, or memoryview, got {type(encrypted_aes_key)}")
+    decrypted_aes_key = fernet.decrypt(encrypted_aes_key)
 
     with file.file.open('rb') as f:
         encrypted_data = f.read()

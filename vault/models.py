@@ -19,7 +19,15 @@ class UserProfile(models.Model):
 
     def get_decrypted_key(self):
         master = Fernet(settings.MASTER_KEY.encode())
-        return master.decrypt(self.encrypted_key)
+        key = self.encrypted_key
+        # Handle Postgres (memoryview), None, or other types
+        if key is None:
+            return None
+        if isinstance(key, memoryview):
+            key = key.tobytes()
+        elif not isinstance(key, (bytes, str)):
+            raise TypeError(f"encrypted_key must be bytes, str, or memoryview, got {type(key)}")
+        return master.decrypt(key)
 
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
