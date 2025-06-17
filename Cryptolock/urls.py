@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/login/', auth_view.LoginView.as_view(template_name='vault/login.html'), name='login'),
     path('accounts/logout/', auth_view.LogoutView.as_view(), name='logout'),
+    path('accounts/',include('allauth.urls')),
     path('',include('vault.urls')),
-
+    
 ]

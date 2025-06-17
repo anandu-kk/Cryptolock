@@ -9,7 +9,11 @@ from .models import UserProfile,EncryptedFile,AccessLog
 
 @login_required
 def dashboard(request):
-    user_profile = UserProfile.objects.get(user=request.user)
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        user_profile = UserProfile.objects.create(user=request.user)
+        user_profile.generate_user_key()
     user_key = user_profile.get_decrypted_key()
     return render(request, 'vault/dashboard.html', {'key': user_key})
     
